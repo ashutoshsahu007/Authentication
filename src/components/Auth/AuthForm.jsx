@@ -19,37 +19,39 @@ const AuthForm = () => {
 
     // optional add validation
     setIsLoading(true);
+    let url = "";
 
     if (isLogin) {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDl6Cd3Y9uuqajZk1rr7W_vEKXcoUSGpmQ";
     } else {
-      fetch(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDl6Cd3Y9uuqajZk1rr7W_vEKXcoUSGpmQ",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email: enterdEmail,
-            password: enteredPassword,
-            returnSecureToken: true,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-        .then((res) => {
-          setIsLoading(false);
-          return res.json().then((data) => {
-            if (!res.ok) {
-              throw new Error(data.error.message);
-            }
-            return data;
-          });
-        })
-        .then((data) => console.log("Signup success:", data))
-        .catch((error) => {
-          alert(error.message || "SignUp failed !!");
-        });
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDl6Cd3Y9uuqajZk1rr7W_vEKXcoUSGpmQ";
     }
+    fetch(url, {
+      method: "POST",
+      body: JSON.stringify({
+        email: enterdEmail,
+        password: enteredPassword,
+        returnSecureToken: true,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        setIsLoading(false);
+        return res.json().then((data) => {
+          if (!res.ok) {
+            throw new Error(data.error.message);
+          }
+          return data;
+        });
+      })
+      .then((data) => console.log(data))
+      .catch((error) => {
+        alert(error.message || "Authentication Failed !!");
+      });
   };
 
   return (
