@@ -4,18 +4,21 @@ import UserProfile from "./components/Profile/UserProfile";
 import AuthPage from "./pages/AuthPage";
 import HomePage from "./pages/HomePage";
 import "./App.css";
+import { AuthContextProvider } from "./components/store/auth-context";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/profile" element={<UserProfile />} />
-        </Routes>
-      </Layout>
-    </BrowserRouter>
+    <AuthContextProvider>
+      <BrowserRouter>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/profile" element={<UserProfile />} />
+          </Routes>
+        </Layout>
+      </BrowserRouter>
+    </AuthContextProvider>
   );
 }
 
