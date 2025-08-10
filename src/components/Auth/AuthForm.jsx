@@ -2,12 +2,14 @@ import { useState, useRef } from "react";
 import classes from "./AuthForm.module.css";
 import { useContext } from "react";
 import AuthContext from "../store/auth-context";
+import { useNavigate } from "react-router-dom";
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
+  const navigate = useNavigate();
 
   const authCtx = useContext(AuthContext);
 
@@ -51,7 +53,10 @@ const AuthForm = () => {
           return data;
         });
       })
-      .then((data) => authCtx.login(data.idToken))
+      .then((data) => {
+        authCtx.login(data.idToken);
+        navigate("/");
+      })
       .catch((error) => {
         alert(error.message || "Authentication Failed !!");
       });
