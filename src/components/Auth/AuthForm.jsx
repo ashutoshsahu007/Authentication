@@ -3,6 +3,7 @@ import classes from "./AuthForm.module.css";
 import { useContext } from "react";
 import AuthContext from "../store/auth-context";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../store/toast-context";
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -10,6 +11,7 @@ const AuthForm = () => {
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const authCtx = useContext(AuthContext);
 
@@ -54,11 +56,14 @@ const AuthForm = () => {
         });
       })
       .then((data) => {
-        authCtx.login(data.idToken);
+        !isLogin && addToast("SignUp Successfull !!", "success");
+        isLogin && authCtx.login(data.idToken);
+        isLogin && addToast("Login Successfull !!", "success");
         navigate("/");
       })
       .catch((error) => {
-        alert(error.message || "Authentication Failed !!");
+        // alert(error.message || "Authentication Failed !!");
+        addToast(error.message, "error");
       });
   };
 

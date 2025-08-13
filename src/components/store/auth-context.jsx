@@ -1,35 +1,41 @@
 import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+// Create Auth Context
 const AuthContext = createContext({
   token: "",
   isLoggedIn: false,
-  login: (token) => {},
+  login: () => {},
   logout: () => {},
 });
+
 export default AuthContext;
 
-export const AuthContextProvider = (props) => {
-  const initialToken = localStorage.getItem("token");
-  const loginTime = localStorage.getItem("loginTime");
+export const AuthContextProvider = ({ children }) => {
   const navigate = useNavigate();
 
-  // If the token is expired even before app loads
-  if (loginTime && Date.now() - loginTime > 5 * 60 * 1000) {
+  // Load saved token and login time from localStorage
+  const storedToken = localStorage.getItem("token");
+  const storedLoginTime = localStorage.getItem("loginTime");
+
+  // If the token is already expired before app loads
+  if (storedLoginTime && Date.now() - storedLoginTime > 5 * 60 * 1000) {
     localStorage.removeItem("token");
     localStorage.removeItem("loginTime");
     navigate("/auth");
   }
 
-  const [token, setToken] = useState(initialToken);
-  const userIsLoggedIn = !!token;
+  const [token, setToken] = useState(storedToken);
+  const isLoggedIn = !!token;
 
-  const loginHandler = (token) => {
-    setToken(token);
-    localStorage.setItem("token", token);
+  // Login Handler
+  const loginHandler = (newToken) => {
+    setToken(newToken);
+    localStorage.setItem("token", newToken);
     localStorage.setItem("loginTime", Date.now());
   };
 
+  // Logout Handler
   const logoutHandler = () => {
     setToken(null);
     localStorage.removeItem("token");
@@ -39,23 +45,23 @@ export const AuthContextProvider = (props) => {
   // Auto logout after 5 minutes
   useEffect(() => {
     if (token) {
-      const remainingTime =
-        5 * 60 * 1000 - (Date.now() - localStorage.getItem("loginTime"));
+      const loginTime = Number(localStorage.getItem("loginTime"));
+      const remainingTime = 5 * 60 * 1000 - (Date.now() - loginTime);
+
       const timer = setTimeout(logoutHandler, remainingTime);
-      return () => clearTimeout(timer); // cleanup on unmount or re-login
+      return () => clearTimeout(timer); // cleanup
     }
   }, [token]);
 
+  // Context value
   const contextValue = {
-    token: token,
-    isLoggedIn: userIsLoggedIn,
+    token,
+    isLoggedIn,
     login: loginHandler,
     logout: logoutHandler,
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {props.children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };

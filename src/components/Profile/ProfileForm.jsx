@@ -2,11 +2,13 @@ import { useContext, useRef } from "react";
 import classes from "./ProfileForm.module.css";
 import AuthContext from "../store/auth-context";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../store/toast-context";
 
 const ProfileForm = () => {
   const newPasswordInputRef = useRef();
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext);
+  const { addToast } = useToast();
 
   const submitHandler = (event) => {
     event.preventDefault();
@@ -28,6 +30,7 @@ const ProfileForm = () => {
     ).then((res) => {
       // asume to be always success
       console.log("Password-changed", res);
+      addToast("password changed successfully !!", "info");
       navigate("/");
     });
   };
